@@ -1,0 +1,193 @@
+{
+  "dataSources": {
+    "ds_lvVlzUew": {
+      "type": "ds.search",
+      "options": {
+        "query": "| savedsearch \"T1059 EncodedCommand Advanced\"\n| stats sum(count) AS hits",
+        "enableSmartSources": true,
+        "queryParameters": {
+          "earliest": "0",
+          "latest": ""
+        }
+      },
+      "name": "Search_1"
+    },
+    "ds_wm4uOd0C": {
+      "type": "ds.search",
+      "options": {
+        "query": "| savedsearch \"T1059 EncodedCommand Advanced\"\n| bin max_len span=100\n| stats count BY max_len",
+        "enableSmartSources": true
+      },
+      "name": "Search_2"
+    },
+    "ds_q7jLWfgx_ds_1q7WWOsK": {
+      "type": "ds.savedSearch",
+      "options": {
+        "ref": "T1059 EncodedCommand Advanced"
+      },
+      "name": "Table search copy 1"
+    },
+    "ds_AnW2GA3q": {
+      "type": "ds.search",
+      "options": {
+        "query": "index=main EncodedCommand\n| rex field=_raw \"(?i)(?:-EncodedCommand|\\$EncodedCommand\\s*=)\\s*['\\\"]?(?<enc_blob>[A-Za-z0-9+/=]{40,})\"\n| bin span=1h _time\n| stats count AS hits by _time\n",
+        "enableSmartSources": true
+      },
+      "name": "Search_5"
+    },
+    "ds_Kvr1aVm6": {
+      "type": "ds.search",
+      "options": {
+        "query": "index=main EncodedCommand earliest=0 \n| timechart span=1s count AS Incidents",
+        "queryParameters": {
+          "earliest": "0",
+          "latest": ""
+        }
+      },
+      "name": "Search_3"
+    }
+  },
+  "visualizations": {
+    "viz_48zsGj0o": {
+      "type": "splunk.singlevalue",
+      "dataSources": {
+        "primary": "ds_lvVlzUew"
+      },
+      "title": "Total Encoded Command Hits",
+      "description": "dasdasd",
+      "eventHandlers": [
+        {
+          "type": "drilldown.customUrl",
+          "options": {
+            "url": "/app/search/search?q=search%20index%3Dmain%20EncodedCommand&earliest=0&latest=",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_RIfrvoOk": {
+      "type": "splunk.table",
+      "options": {
+        "count": 20,
+        "dataOverlayMode": "none",
+        "drilldown": "none",
+        "showRowNumbers": false,
+        "showInternalFields": false,
+        "columnFormat": {
+          "distinct_blobs": {
+            "width": 90
+          },
+          "count": {
+            "width": 60
+          }
+        }
+      },
+      "dataSources": {
+        "primary": "ds_q7jLWfgx_ds_1q7WWOsK"
+      },
+      "title": "Host Statistics"
+    },
+    "viz_l3itIM2U": {
+      "type": "splunk.line",
+      "dataSources": {
+        "primary": "ds_Kvr1aVm6"
+      },
+      "containerOptions": {
+        "visibility": {}
+      },
+      "showProgressBar": true,
+      "showLastUpdated": false,
+      "options": {
+        "y": "> primary | frameBySeriesNames('Incidents')",
+        "overlayFields": [],
+        "showIndependentYRanges": true,
+        "dataValuesDisplay": "all",
+        "legendDisplay": "off",
+        "yAxisTitleText": "Hits",
+        "xAxisTitleText": "Time",
+        "xAxisLabelVisibility": "show",
+        "showXMajorGridLines": true
+      },
+      "title": "EncodedCommand Timeline (sec)"
+    }
+  },
+  "applicationProperties": {
+    "hideEdit": false,
+    "hideExport": false,
+    "collapseNavigation": false
+  },
+  "inputs": {},
+  "layout": {
+    "options": {},
+    "globalInputs": [],
+    "tabs": {
+      "items": [
+        {
+          "layoutId": "layout_1",
+          "label": "Main"
+        }
+      ]
+    },
+    "layoutDefinitions": {
+      "layout_1": {
+        "type": "grid",
+        "structure": [
+          {
+            "item": "viz_48zsGj0o",
+            "type": "block",
+            "position": {
+              "x": 0,
+              "y": 0,
+              "w": 391,
+              "h": 421
+            }
+          },
+          {
+            "item": "viz_l3itIM2U",
+            "type": "block",
+            "position": {
+              "x": 0,
+              "y": 421,
+              "w": 1440,
+              "h": 400
+            }
+          },
+          {
+            "item": "viz_RIfrvoOk",
+            "type": "block",
+            "position": {
+              "x": 391,
+              "y": 0,
+              "w": 1049,
+              "h": 421
+            }
+          }
+        ],
+        "options": {
+          "width": 1440,
+          "height": 960,
+          "backgroundColor": "#ffffff"
+        }
+      }
+    }
+  },
+  "title": "T1059.001 PowerShell Demo",
+  "description": "Detects PowerShell EncodedCommand usage (MITRE T1059.001) and flags any Base-64 blob larger than 500 bytes.",
+  "defaults": {
+    "dataSources": {
+      "ds.search": {
+        "options": {
+          "queryParameters": {
+            "latest": "$global_time.latest$",
+            "earliest": "$global_time.earliest$"
+          }
+        }
+      }
+    },
+    "visualizations": {
+      "global": {
+        "showProgressBar": true
+      }
+    }
+  }
+}
