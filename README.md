@@ -1,6 +1,6 @@
-# T1059.001 • PowerShell EncodedCommand Demo
-> **Detects PowerShell EncodedCommand usage (MITRE ATT&CK T1059.001)
-> and flags any Base-64 blob larger than 500 bytes.**
+# T1059.001 • PowerShell EncodedCommand Detection (Splunk Dashboard)
+> Splunk dashboard that detects PowerShell EncodedCommand usage (MITRE ATT&CK T1059.001) by flagging Base64 blobs over 500 bytes.
+
 
 | Dashboard  | Saved Search        | Splunk version |
 |------------|---------------------|----------------|
